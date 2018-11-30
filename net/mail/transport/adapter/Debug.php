@@ -3,7 +3,7 @@
 namespace li3_mailer\net\mail\transport\adapter;
 
 use lithium\core\Libraries;
-use lithium\util\String;
+use lithium\util\Text;
 use Closure;
 use RuntimeException;
 
@@ -82,7 +82,7 @@ class Debug extends \li3_mailer\net\mail\Transport {
 				return $formatter($message);
 			case is_string($formatter):
 				$data = $this->_messageData($message);
-				return String::insert($formatter, $data);
+				return Text::insert($formatter, $data);
 			default:
 				$error = "Formatter for format `{$format}` " .
 					"is neither string nor closure.";
@@ -92,7 +92,7 @@ class Debug extends \li3_mailer\net\mail\Transport {
 
 	/**
 	 * Helper method for getting log formatters indexed by name. Values may be
-	 * `String::insert()` style strings (receiving the `Message`'s properties
+	 * `Text::insert()` style strings (receiving the `Message`'s properties
 	 * as data according to `_messageData()`) or closures (receiving the
 	 * `Message` as the argument and should return a string that will be placed
 	 * in the log).
@@ -100,7 +100,7 @@ class Debug extends \li3_mailer\net\mail\Transport {
 	 *
 	 * @see li3_mailer\net\mail\transport\adapter\Debug::_messageData()
 	 * @see li3_mailer\net\mail\transport\adapter\Debug::_format()
-	 * @see lithium\util\String::insert()
+	 * @see lithium\util\Text::insert()
 	 * @return array Available formatters indexed by name.
 	 */
 	protected function _formatters() {
@@ -126,7 +126,7 @@ class Debug extends \li3_mailer\net\mail\Transport {
 	}
 
 	/**
-	 * Helper method to get message property data for `String::insert()`
+	 * Helper method to get message property data for `Text::insert()`
 	 * style formatters. Additional data may be added with the
 	 * configuration key `'messageData'`, which should be an array of:
 	 *

@@ -62,26 +62,27 @@ class MailgunTest extends \lithium\test\Unit {
 	}
 
 	public function testParametersNoDomainNorUrl() {
-		$error = "No `domain` (nor `url`) configured ";
-		$error .= "for `Mailgun` transport adapter.";
-		$this->expectException($error);
-		$this->_parameters();
+		$this->assertException('No `domain` (nor `url`) configured for `Mailgun` transport adapter.', function () {
+			$this->_parameters();
+		});
 	}
 
 	public function testParametersApiEndsWithSlash() {
-		$this->expectException("API endpoint should not end with '/'.");
-		$options = array('api' => 'http://foo.bar/', 'domain' => 'foo.bar');
-		$this->_parameters($options);
+		$this->assertException("API endpoint should not end with '/'.", function () {
+			$this->_parameters(array('api' => 'http://foo.bar/', 'domain' => 'foo.bar'));
+		});
 	}
 
 	public function testParametersDomainStartsWithSlash() {
-		$this->expectException("Domain should not start with '/'.");
-		$this->_parameters(array('domain' => '/foo.bar'));
+		$this->assertException("Domain should not start with '/'.", function () {
+			$this->_parameters(array('domain' => '/foo.bar'));
+		});
 	}
 
 	public function testParametersDomainEndsWithSlash() {
-		$this->expectException("Domain should not end with '/'.");
-		$this->_parameters(array('domain' => 'foo.bar/'));
+		$this->assertException("Domain should not end with '/'.", function () {
+			$this->_parameters(array('domain' => 'foo.bar/'));
+		});
 	}
 
 	public function testExtraParameters() {

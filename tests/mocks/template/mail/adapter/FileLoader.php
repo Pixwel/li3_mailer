@@ -1,8 +1,7 @@
 <?php
-
 namespace li3_mailer\tests\mocks\template\mail\adapter;
 
-use lithium\util\String;
+use lithium\util\Text;
 use lithium\template\TemplateException;
 
 class FileLoader extends \lithium\template\view\adapter\File {
@@ -12,7 +11,7 @@ class FileLoader extends \lithium\template\view\adapter\File {
 			throw new TemplateException("Invalid template type '{$type}'.");
 		}
 		return array_map(function($path) use ($params) {
-			return String::insert($path, $params);
+			return Text::insert($path, $params);
 		}, (array) $this->_paths[$type]);
 	}
 }

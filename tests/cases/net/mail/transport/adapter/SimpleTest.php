@@ -134,12 +134,13 @@ class SimpleTest extends \lithium\test\Unit {
 	}
 
 	public function testAttachmentErrorNoFile() {
-		$simple = $this->_adapter();
-		$message = new Message(array('attach' => array(
-			'/foo/bar' => array('filename' => 'file.txt', 'check' => false)
-		)));
-		$this->expectException('/^Can not attach path `\/foo\/bar`\.$/');
-		$simple->deliver($message);
+		$this->assertException('/^Can not attach path `\/foo\/bar`\.$/', function () {
+			$simple = $this->_adapter();
+			$message = new Message(array('attach' => array(
+				'/foo/bar' => array('filename' => 'file.txt', 'check' => false)
+			)));
+			$simple->deliver($message);
+		});
 	}
 
 	public function testAttachmentWithoutFilename() {

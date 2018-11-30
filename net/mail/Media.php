@@ -2,6 +2,7 @@
 
 namespace li3_mailer\net\mail;
 
+use lithium\aop\Filters;
 use li3_mailer\net\mail\MediaException;
 use lithium\core\Libraries;
 
@@ -58,10 +59,10 @@ class Media extends \lithium\core\StaticObject {
 	 * @param array $options Optional. The handling options for this media type.
 	 *        Possible keys are:
 	 *        - `'layout'` _mixed_: Specifies one or more
-	 *          `String::insert()`-style paths to use when searching for layout
+	 *          `Text::insert()`-style paths to use when searching for layout
 	 *          files (either a string or array of strings).
 	 *        - `'template'` _mixed_: Specifies one or more
-	 *          `String::insert()`-style paths to use when searching for
+	 *          `Text::insert()`-style paths to use when searching for
 	 *          template files (either a string or array of strings).
 	 *        - `'view'` _string_: Specifies the view class to use when
 	 *          rendering this content.
@@ -104,8 +105,7 @@ class Media extends \lithium\core\StaticObject {
 	public static function render(&$message, $data = null, array $options = array()) {
 		$params = array('message' => &$message) + compact('data', 'options');
 		$handlers = static::_handlers();
-
-		$filter = function($self, $params) use ($handlers) {
+		$filter = function($params) use ($handlers) {
 			$defaults = array(
 				'template' => null, 'layout' => 'default', 'view' => null
 			);
@@ -122,17 +122,12 @@ class Media extends \lithium\core\StaticObject {
 				$filter = function($v) { return $v !== null; };
 				$handler = array_filter($handler, $filter);
 				$handler += $handlers['default'] + $defaults;
-				$handler['paths'] = $self::invokeMethod(
-					'_finalizePaths',
-					array($handler['paths'], $options)
-				);
-
-				$params = array($handler, $data, $message);
-				$message->body($type, $self::invokeMethod('_handle', $params));
+				$handler['paths'] = static::_finalizePaths($handler['paths'], $options);
+				$message->body($type, static::_handle($handler, $data, $message));
 			}
 			$message->ensureStandardCompliance();
 		};
-		static::_filter(__FUNCTION__, $params, $filter);
+		return Filters::run(get_called_class(), __FUNCTION__, $params, $filter);
 	}
 
 	/**
@@ -150,7 +145,7 @@ class Media extends \lithium\core\StaticObject {
 	protected static function _handle($handler, $data, &$message) {
 		$params = array('message' => &$message) + compact('handler', 'data');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			$message = $params['message'];
 			$handler = $params['handler'];
 			$data = $params['data'];
@@ -161,7 +156,7 @@ class Media extends \lithium\core\StaticObject {
 					return $data;
 				case $handler['view']:
 					unset($options['view']);
-					$view = $self::view($handler, $data, $message, $options);
+					$view = static::view($handler, $data, $message, $options);
 					return $view->render('all', (array) $data, $options);
 				default:
 					$error = 'Could not interpret type settings for handler.';
@@ -193,20 +188,20 @@ class Media extends \lithium\core\StaticObject {
 		$params = array('message' => &$message);
 		$params += compact('handler', 'data', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			$data = $params['data'];
 			$options = $params['options'];
 			$handler = $params['handler'];
 			$message =& $params['message'];
 
 			if (!is_array($handler)) {
-				$handler = $self::invokeMethod('_handlers', array($handler));
+				$handler = static::_handlers($handler);
 			}
 			$class = $handler['view'];
 			unset($handler['view']);
 
 			$config = $handler + array('message' => &$message);
-			return $self::invokeMethod('_instance', array($class, $config));
+			return static::_instance($class, $config);
 		});
 	}
 
@@ -240,7 +235,7 @@ class Media extends \lithium\core\StaticObject {
 		$options += $defaults;
 		$params = compact('path', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			extract($params);
 
 			if (preg_match('/^[a-z0-9-]+:\/\//i', $path)) {
@@ -309,7 +304,7 @@ class Media extends \lithium\core\StaticObject {
 
 	/**
 	 * Finalize paths according to available data. Paths defined as arrays
-	 * may have the `String::insert()` style paths as the indexes and use
+	 * may have the `Text::insert()` style paths as the indexes and use
 	 * a string or array of strings of keys that should be presented in the
 	 * data to enable that path. This way conditional paths may be defined,
 	 * and is used by the `'default'` handler to enable/disable `'template'`
@@ -360,7 +355,7 @@ class Media extends \lithium\core\StaticObject {
 	 */
 	protected static function _request($message) {
 		$params = compact('message');
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			extract($params);
 			$config = array();
 			if ($message && ($baseURL = $message->baseURL)) {
@@ -375,7 +370,7 @@ class Media extends \lithium\core\StaticObject {
 				}
 				$config += compact('env', 'base');
 			}
-			return $self::invokeMethod('_instance', array('request', $config));
+			return static::_instance('request', $config);
 		});
 	}
 }

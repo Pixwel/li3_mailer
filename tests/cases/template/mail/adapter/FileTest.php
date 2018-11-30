@@ -74,9 +74,10 @@ class FileTest extends \lithium\test\Unit {
 	}
 
 	public function testBadHelper() {
-		$file = new File();
-		$this->expectException('Mail helper `foo` not found.');
-		$helper = $file->helper('foo');
+		$this->assertException('Mail helper `foo` not found.', function () {
+			$file = new File();
+			$helper = $file->helper('foo');
+		});
 	}
 
 	public function testMessage() {
@@ -96,15 +97,15 @@ class FileTest extends \lithium\test\Unit {
 	public function testHandlers() {
 		$file = new File();
 
-		$this->assertFalse(trim($file->scripts()));
+		$this->assertEmpty(trim($file->scripts()));
 		$this->assertEqual('foobar', trim($file->scripts('foobar')));
 		$this->assertEqual('foobar', trim($file->scripts()));
 
-		$this->assertFalse(trim($file->styles()));
+		$this->assertEmpty(trim($file->styles()));
 		$this->assertEqual('foobar', trim($file->styles('foobar')));
 		$this->assertEqual('foobar', trim($file->styles()));
 
-		$this->assertFalse(trim($file->head()));
+		$this->assertEmpty(trim($file->head()));
 		$this->assertEqual('foo', trim($file->head('foo')));
 		$this->assertEqual("foo\n\tbar", trim($file->head('bar')));
 		$this->assertEqual("foo\n\tbar", trim($file->head()));

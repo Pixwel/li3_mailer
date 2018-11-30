@@ -1,6 +1,7 @@
 <?php
-
 namespace li3_mailer\template\helper\mail;
+
+use lithium\aop\Filters;
 
 /**
  * A template helper that assists in generating HTML content.
@@ -90,12 +91,11 @@ class Html extends \lithium\template\helper\Html {
 		$params = compact('path', 'options', 'scope');
 		$method = __METHOD__;
 
-		$filter = function($self, $params, $chain) use ($method) {
+		$filter = function($params) use ($method) {
 			extract($params);
-			$args = array($method, 'image', compact('path', 'options'), $scope);
-			return $self->invokeMethod('_render', $args);
+			return $this->_render($method, 'image', compact('path', 'options'), $scope);
 		};
-		return $this->_filter($method, $params, $filter);
+		return Filters::run($this, __FUNCTION__, $params, $filter);
 	}
 }
 

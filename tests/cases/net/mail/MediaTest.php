@@ -41,15 +41,15 @@ class MediaTest extends \lithium\test\Unit {
 	}
 
 	public function testBadHandler() {
-		Media::type('foo', 'bar', array('view' => false, 'template' => false));
-		$message = new Message(array(
-			'from' => 'valid@address', 'types' => 'foo'
-		));
-		$this->expectException(
-			'Could not interpret type settings for handler.'
-		);
-		Media::render($message);
-		Media::type('foo', false);
+		$this->assertException('Could not interpret type settings for handler.', function () {
+			Media::type('foo', 'bar', array('view' => false, 'template' => false));
+			$message = new Message(array(
+				'from' => 'valid@address', 'types' => 'foo'
+			));
+			Media::render($message);
+			Media::type('foo', false);
+		});
+
 	}
 
 	public function testView() {
@@ -112,9 +112,10 @@ class MediaTest extends \lithium\test\Unit {
 	}
 
 	public function testBadType() {
-		$message = new Message(array('types' => 'foobar'));
-		$this->expectException('Unhandled media type `foobar`.');
-		Media::render($message);
+		$this->assertException('Unhandled media type `foobar`.', function () {
+			$message = new Message(array('types' => 'foobar'));
+			Media::render($message);
+		});
 	}
 
 	public function testAsset() {

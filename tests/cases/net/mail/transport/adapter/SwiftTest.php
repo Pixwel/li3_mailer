@@ -26,17 +26,15 @@ class SwiftTest extends \lithium\test\Unit {
 	}
 
 	public function testBadTransport() {
-		$swift = new Swift();
-		$this->expectException(
-			'Unknown transport type `` for `Swift` adapter.'
-		);
-		$transport = $swift->invokeMethod('_transport');
+		$this->assertException('Unknown transport type `` for `Swift` adapter.', function () {
+			$swift = new Swift();
+			$transport = $swift->invokeMethod('_transport');
+		});
 
-		$swift = new Swift(array('transport' => 'foo'));
-		$this->expectException(
-			'Unknown transport type `foo` for `Swift` adapter.'
-		);
-		$transport = $swift->invokeMethod('_transport');
+		$this->assertException('Unknown transport type `foo` for `Swift` adapter.', function () {
+			$swift = new Swift(array('transport' => 'foo'));
+			$transport = $swift->invokeMethod('_transport');
+		});
 	}
 
 	public function testMailTransport() {

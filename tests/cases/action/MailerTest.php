@@ -1,7 +1,7 @@
 <?php
-
 namespace li3_mailer\tests\cases\action;
 
+use lithium\aop\Filters;
 use li3_mailer\tests\mocks\action\Mailer;
 use li3_mailer\tests\mocks\action\MailerOverload;
 use li3_mailer\tests\mocks\action\TestMailer;
@@ -9,13 +9,13 @@ use li3_mailer\tests\mocks\action\MailerWithOptions;
 use li3_mailer\tests\mocks\action\MailerWithoutDelivery;
 use li3_mailer\net\mail\Message;
 
-$filter = function($self, $params, $chain) {
-	$result = $chain->next($self, $params, $chain);
+$filter = function($params, $next) {
+	$result = $next($params);
 	return $params + compact('result');
 };
-Mailer::applyFilter('deliver', $filter);
-TestMailer::applyFilter('deliver', $filter);
-MailerWithoutDelivery::applyFilter('deliver', $filter);
+Filters::apply(Mailer::class, 'deliver', $filter);
+Filters::apply(TestMailer::class, 'deliver', $filter);
+Filters::apply(MailerWithoutDelivery::class, 'deliver', $filter);
 
 class MailerTest extends \lithium\test\Unit {
 
@@ -92,10 +92,9 @@ class MailerTest extends \lithium\test\Unit {
 	}
 
 	public function testOverloadException() {
-		$this->expectException(
-			'Method `foobar` not defined or handled in class `Mailer`.'
-		);
-		Mailer::foobar();
+		$this->assertException('Method `foobar` not defined or handled in class `Mailer`.', function () {
+			Mailer::foobar();
+		});
 	}
 
 	public function testOptions() {

@@ -64,27 +64,27 @@ class MessageTest extends \lithium\test\Unit {
 		$this->assertEqual(null, $message->date);
 		$message->invokeMethod('ensureValidDate');
 		$this->assertTrue(is_int($message->date));
-		$message = new Message(array('date' => 'invalid'));
-		$this->assertEqual('invalid', $message->date);
-		$this->expectException('/Invalid date timestamp `invalid`/');
-		$message->invokeMethod('ensureValidDate');
+
+		$this->assertException('/Invalid date timestamp `invalid`/', function () {
+			$message = new Message(array('date' => 'invalid'));
+			$this->assertEqual('invalid', $message->date);
+			$message->invokeMethod('ensureValidDate');
+		});
 	}
 
 	public function testEnsureValidFromWithInteger() {
-		$message = new Message(array('from' => 42));
-		$this->expectException(
-			'/`\$from` field should be a string or an array/'
-		);
-		$message->invokeMethod('ensureValidFrom');
+		$this->assertException('/`\$from` field should be a string or an array/', function () {
+			$message = new Message(array('from' => 42));
+			$message->invokeMethod('ensureValidFrom');
+		});
 	}
 
 	public function testEnsureValidFromWithEmpty() {
 		foreach (array(null, false, 0) as $from) {
-			$message = new Message(compact('from'));
-			$this->expectException(
-				'`Message` should have at least one `$from` address.'
-			);
-			$message->invokeMethod('ensureValidFrom');
+			$this->assertException('`Message` should have at least one `$from` address.', function () {
+				$message = new Message(compact('from'));
+				$message->invokeMethod('ensureValidFrom');
+			});
 		}
 	}
 
@@ -117,11 +117,10 @@ class MessageTest extends \lithium\test\Unit {
 		$message->invokeMethod('ensureValidSender');
 		$this->assertEqual('bar@foo', $message->sender);
 
-		$message = new Message(array('sender' => array('foo@bar', 'bar@foo')));
-		$this->expectException(
-			'`Message` should only have a single `$sender` address.'
-		);
-		$message->invokeMethod('ensureValidSender');
+		$this->assertException('`Message` should only have a single `$sender` address.', function () {
+			$message = new Message(array('sender' => array('foo@bar', 'bar@foo')));
+			$message->invokeMethod('ensureValidSender');
+		});
 	}
 
 	public function testEnsureStandardCompliance() {
@@ -186,27 +185,24 @@ class MessageTest extends \lithium\test\Unit {
 	}
 
 	public function testAttachErrorNothingToAttach() {
-		$message = new Message();
-		$this->expectException(
-			'/^Neither path nor data provided, cannot attach\.$/'
-		);
-		$message->attach(null);
+		$this->assertException('/^Neither path nor data provided, cannot attach\.$/', function () {
+			$message = new Message();
+			$message->attach(null);
+		});
 	}
 
 	public function testAttachErrorFileDoesNotExist() {
-		$message = new Message();
-		$this->expectException(
-			'/^File at `foo\/bar` is not a valid asset, cannot attach\.$/'
-		);
-		$message->attach('foo/bar');
+		$this->assertException('/^File at `foo\/bar` is not a valid asset, cannot attach\.$/', function () {
+			$message = new Message();
+			$message->attach('foo/bar');
+		});
 	}
 
 	public function testAttachErrorDataIsInvalid() {
-		$message = new Message();
-		$this->expectException(
-			'/^Data should be a string, `integer` given, cannot attach\.$/'
-		);
-		$message->attach(null, array('data' => 42));
+		$this->assertException('/^Data should be a string, `integer` given, cannot attach\.$/', function () {
+			$message = new Message();
+			$message->attach(null, array('data' => 42));
+		});
 	}
 
 	public function testAttachRelativePath() {

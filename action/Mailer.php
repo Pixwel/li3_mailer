@@ -2,6 +2,7 @@
 
 namespace li3_mailer\action;
 
+use lithium\aop\Filters;
 use lithium\util\Inflector;
 use BadMethodCallException;
 
@@ -59,13 +60,13 @@ class Mailer extends \lithium\core\StaticObject {
 	 * @return li3_mailer\net\mail\Message A message instance.
 	 */
 	public static function message(array $options = array()) {
-		$filter = function($self, $params) {
+		$filter = function($params) {
 			$options = $params['options'];
 			$class = isset($options['class']) ? $options['class'] : 'message';
 			unset($options['class']);
-			return $self::invokeMethod('_instance', array($class, $options));
+			return static::_instance($class, $options);
 		};
-		return static::_filter(__FUNCTION__, compact('options'), $filter);
+		return Filters::run(get_called_class(), __FUNCTION__, compact('options'), $filter);
 	}
 
 	/**
@@ -128,12 +129,12 @@ class Mailer extends \lithium\core\StaticObject {
 		$params = compact('options', 'data', 'message');
 		$params += compact('transport', 'transportOptions');
 
-		$filter = function($self, $params) use ($media) {
+		$filter = function($params) use ($media) {
 			extract($params);
 			$media::render($message, $data, $options);
 			return $transport->deliver($message, $transportOptions);
 		};
-		return static::_filter(__FUNCTION__, $params, $filter);
+		return Filters::run(get_called_class(), __FUNCTION__, $params, $filter);
 	}
 
 	/**

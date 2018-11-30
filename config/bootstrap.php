@@ -17,8 +17,8 @@ Libraries::paths(array('helper' => array_merge(array(
 $existing = Libraries::paths('adapter');
 $key = '{:library}\{:namespace}\{:class}\adapter\{:name}';
 $existing[$key]['libraries'] = array_merge(
-    (array) $existing[$key]['libraries'],
-    (array) 'li3_mailer'
+    isset($existing[$key]['libraries']) ? (array) $existing[$key]['libraries'] : [],
+    ['li3_mailer']
 );
 Libraries::paths(array('adapter' => $existing));
 

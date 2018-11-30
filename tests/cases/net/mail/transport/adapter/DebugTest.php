@@ -145,12 +145,11 @@ class DebugTest extends \lithium\test\Unit {
 	}
 
 	public function testFormatBadFormatter() {
-		$message = new Message();
-		$debug = new Debug();
-		$this->expectException(
-			'Formatter for format `foo` is neither string nor closure.'
-		);
-		$debug->invokeMethod('_format', array($message, 'foo'));
+		$this->assertException('Formatter for format `foo` is neither string nor closure.', function () {
+			$message = new Message();
+			$debug = new Debug();
+			$debug->invokeMethod('_format', array($message, 'foo'));
+		});
 	}
 }
 
