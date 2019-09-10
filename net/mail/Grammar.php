@@ -9,7 +9,7 @@ namespace li3_mailer\net\mail;
  * @see http://tools.ietf.org/html/rfc2822
  * @see li3_mailer\net\mail\Message
  */
-class Grammar extends \lithium\core\Object {
+class Grammar extends \lithium\core\ObjectDeprecated {
 	/**
 	 * Tokens and matching regular expression( part)s as key value pairs,
 	 * defined in RFC 2822 (and some related RFCs).

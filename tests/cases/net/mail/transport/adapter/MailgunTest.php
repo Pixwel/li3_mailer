@@ -120,7 +120,7 @@ class MailgunTest extends \lithium\test\Unit {
 	protected function _parameters($options = array(), $message = array()) {
 		$mailgun = new Mailgun();
 		$message = new Message($message);
-		return $mailgun->invokeMethod('_parameters', array($message, $options));
+		return $mailgun->parameters($message, $options);
 	}
 }
 

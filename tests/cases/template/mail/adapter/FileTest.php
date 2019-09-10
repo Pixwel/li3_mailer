@@ -6,6 +6,7 @@ use li3_mailer\template\mail\adapter\File;
 use li3_mailer\template\helper\mail\Html;
 use li3_mailer\net\mail\Message;
 use li3_mailer\tests\mocks\template\MailWithoutRender;
+use li3_mailer\tests\mocks\template\mail\adapter\File as FileMock;
 use lithium\net\http\Router;
 
 class FileTest extends \lithium\test\Unit {
@@ -88,8 +89,8 @@ class FileTest extends \lithium\test\Unit {
 
 	public function testRenderDoesNotSetLibrary() {
 		$view = new MailWithoutRender();
-		$file = new File(compact('view'));
-		$params = $file->invokeMethod('_render', array('element', 'foo'));
+		$file = new FileMock(compact('view'));
+		$params = $file->__render('element', 'foo');
 		extract($params);
 		$this->assertFalse(isset($options['library']));
 	}

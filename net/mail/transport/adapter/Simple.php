@@ -60,7 +60,7 @@ class Simple extends \li3_mailer\net\mail\Transport {
 	 */
 	public function deliver($message, array $options = array()) {
 		$mail = $this->_dependencies['mail'];
-		$to = $this->_address($message->to);
+		$to = $this->address($message->to);
 		list($headers, $body) = $this->_generate($message);
 
 		return call_user_func($mail, $to, $message->subject, $body, $headers);
@@ -79,7 +79,7 @@ class Simple extends \li3_mailer\net\mail\Transport {
 				$property = $header;
 				$header = ucfirst($property);
 			}
-			$headers[$header] = $this->_address($message->$property);
+			$headers[$header] = $this->address($message->$property);
 		}
 		$headers['Date'] = date('r', $message->date);
 		$headers['MIME-Version'] = "1.0";

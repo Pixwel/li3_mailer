@@ -11,7 +11,7 @@ namespace li3_mailer\net\mail;
  * @see li3_mailer\net\mail\transport\adapter\Swift
  * @see li3_mailer\net\mail\transport\adapter\Mailgun
  */
-abstract class Transport extends \lithium\core\Object {
+abstract class Transport extends \lithium\core\ObjectDeprecated {
 	/**
 	 * Deliver a message.
 	 *
@@ -27,7 +27,7 @@ abstract class Transport extends \lithium\core\Object {
 	 * @param mixed $address Address to format, may be a string or array.
 	 * @return string Formatted address list.
 	 */
-	protected function _address($address) {
+	public function address($address) {
 		if (is_array($address)) {
 			return join(", ", array_map(function($name, $address) {
 				return is_int($name) ? $address : "{$name} <{$address}>";

@@ -8,20 +8,20 @@ class TransportTest extends \lithium\test\Unit {
 	public function testAddress() {
 		$transport = new Transport();
 
-		$result = $transport->invokeMethod('_address', array('foo@bar'));
+		$result = $transport->address('foo@bar');
 		$this->assertEqual('foo@bar', $result);
 
-		$result = $transport->invokeMethod('_address', array(array('foo@bar')));
+		$result = $transport->address(array('foo@bar'));
 		$this->assertEqual('foo@bar', $result);
 
-		$result = $transport->invokeMethod('_address', array(array(
+		$result = $transport->address(array(
 			'Foo' => 'foo@bar'
-		)));
+		));
 		$this->assertEqual('Foo <foo@bar>', $result);
 
-		$result = $transport->invokeMethod('_address', array(array(
+		$result = $transport->address(array(
 			'Foo' => 'foo@bar', 'Bar' => 'bar@foo'
-		)));
+		));
 		$this->assertEqual('Foo <foo@bar>, Bar <bar@foo>', $result);
 	}
 }

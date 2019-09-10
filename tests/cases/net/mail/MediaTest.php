@@ -17,7 +17,7 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual('bar', Media::type('foo'));
 		$this->assertEqual(array(
 			'text' => 'text/plain', 'html' => 'text/html', 'foo' => 'bar'
-		), Media::invokeMethod('_types'));
+		), Media::types());
 		Media::type('foo', false);
 		$this->assertEqual(null, Media::type('foo'));
 	}
@@ -68,8 +68,8 @@ class MediaTest extends \lithium\test\Unit {
 			'view' => 'li3_mailer\tests\mocks\template\Mail',
 			'template' => null
 		));
-		$baseHandler = Media::invokeMethod('_handlers', array('foo'));
-		$baseHandler += Media::invokeMethod('_handlers', array('default'));
+		$baseHandler = Media::handlers('foo');
+		$baseHandler += Media::handlers('default');
 		$baseHandler += array('compile' => false);
 
 		$handler = $baseHandler;
@@ -77,10 +77,7 @@ class MediaTest extends \lithium\test\Unit {
 			'library' => true, 'mailer' => null,
 			'template' => 'foo', 'type' => 'text'
 		);
-		$handler['paths'] = Media::invokeMethod(
-			'_finalizePaths',
-			array($handler['paths'], $options)
-		);
+		$handler['paths'] = Media::finalizePaths($handler['paths'], $options);
 		$view = Media::view($handler, array(), $message);
 		$this->assertTrue($view instanceof Mail);
 		$loader = $view->loader();
@@ -93,10 +90,7 @@ class MediaTest extends \lithium\test\Unit {
 			'library' => true, 'mailer' => 'bar',
 			'template' => 'foo', 'type' => 'text'
 		);
-		$handler['paths'] = Media::invokeMethod(
-			'_finalizePaths',
-			array($handler['paths'], $options)
-		);
+		$handler['paths'] = Media::finalizePaths($handler['paths'], $options);;
 		$view = Media::view($handler, array(), $message);
 		$this->assertTrue($view instanceof Mail);
 		$loader = $view->loader();
@@ -139,7 +133,7 @@ class MediaTest extends \lithium\test\Unit {
 	}
 
 	public function testRequest() {
-		$request = Media::invokeMethod('_request', array(null));
+		$request = Media::request(null);
 
 		$tests = array(
 			'foo.local' => array('HTTP_HOST' => 'foo.local'),
@@ -154,7 +148,7 @@ class MediaTest extends \lithium\test\Unit {
 
 		foreach ($tests as $baseURL => $expect) {
 			$message = new Message(compact('baseURL'));
-			$request = Media::invokeMethod('_request', array($message));
+			$request = Media::request($message);
 			$expect += array('HTTPS' => false, 'base' => '');
 
 			foreach ($expect as $key => $expected) {

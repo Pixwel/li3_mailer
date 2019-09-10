@@ -62,20 +62,20 @@ class MessageTest extends \lithium\test\Unit {
 	public function testEnsureValidDate() {
 		$message = new Message();
 		$this->assertEqual(null, $message->date);
-		$message->invokeMethod('ensureValidDate');
+		$message->ensureValidDate();
 		$this->assertTrue(is_int($message->date));
 
 		$this->assertException('/Invalid date timestamp `invalid`/', function () {
 			$message = new Message(array('date' => 'invalid'));
 			$this->assertEqual('invalid', $message->date);
-			$message->invokeMethod('ensureValidDate');
+			$message->ensureValidDate();
 		});
 	}
 
 	public function testEnsureValidFromWithInteger() {
 		$this->assertException('/`\$from` field should be a string or an array/', function () {
 			$message = new Message(array('from' => 42));
-			$message->invokeMethod('ensureValidFrom');
+			$message->ensureValidFrom();
 		});
 	}
 
@@ -83,43 +83,43 @@ class MessageTest extends \lithium\test\Unit {
 		foreach (array(null, false, 0) as $from) {
 			$this->assertException('`Message` should have at least one `$from` address.', function () {
 				$message = new Message(compact('from'));
-				$message->invokeMethod('ensureValidFrom');
+				$message->ensureValidFrom();
 			});
 		}
 	}
 
 	public function testEnsureValidFromWithValid() {
 		$message = new Message(array('from' => 'valid@address'));
-		$message->invokeMethod('ensureValidFrom');
+		$message->ensureValidFrom();
 	}
 
 	public function testEnsureValidSender() {
 		$message = new Message(array('from' => 'foo@bar'));
-		$message->invokeMethod('ensureValidSender');
+		$message->ensureValidSender();
 		$this->assertEqual(null, $message->sender);
 
 		$message = new Message(array('from' => array('foo@bar', 'bar@foo')));
-		$message->invokeMethod('ensureValidSender');
+		$message->ensureValidSender();
 		$this->assertEqual(array('foo@bar'), $message->sender);
 
 		$from = array('foo' => 'foo@bar', 'bar' => 'bar@foo');
 		$message = new Message(compact('from'));
-		$message->invokeMethod('ensureValidSender');
+		$message->ensureValidSender();
 		$this->assertEqual(array('foo' => 'foo@bar'), $message->sender);
 
 		$options = array('from' => 'foo@bar', 'sender' => 'foo@bar');
 		$message = new Message($options);
-		$message->invokeMethod('ensureValidSender');
+		$message->ensureValidSender();
 		$this->assertEqual(null, $message->sender);
 
 		$options = array('from' => 'foo@bar', 'sender' => 'bar@foo');
 		$message = new Message($options);
-		$message->invokeMethod('ensureValidSender');
+		$message->ensureValidSender();
 		$this->assertEqual('bar@foo', $message->sender);
 
 		$this->assertException('`Message` should only have a single `$sender` address.', function () {
 			$message = new Message(array('sender' => array('foo@bar', 'bar@foo')));
-			$message->invokeMethod('ensureValidSender');
+			$message->ensureValidSender();
 		});
 	}
 
@@ -156,19 +156,19 @@ class MessageTest extends \lithium\test\Unit {
 		$message = new Message(array('baseURL' => 'foo.local'));
 		$this->assertPattern(
 			'/^[^@]+@foo.local$/',
-			$message->invokeMethod('_randomId')
+			$message->randomId()
 		);
 
 		$message = new Message();
 		$this->assertPattern(
 			'/^[^@]+@' . $this->_base() . '$/',
-			$message->invokeMethod('_randomId')
+			$message->randomId()
 		);
 
 		$message = new Message(array('baseURL' => 'foo@local'));
 		$this->assertPattern(
 			'/^[^@]+@li3_mailer.generated$/',
-			$message->invokeMethod('_randomId')
+			$message->randomId()
 		);
 	}
 

@@ -17,11 +17,11 @@ use RuntimeException;
  *     'domain' => 'my.domain'
  * )));}}}
  * Apart from message parameters (like `'from'`, `'to'`, etc.) for supported
- * options see `_parameters()` and `deliver()`.
+ * options see `parameters()` and `deliver()`.
  *
  * @see http://documentation.mailgun.net
  * @see http://php.net/curl
- * @see li3_mailer\net\mail\transport\adapter\Mailgun::_parameters()
+ * @see li3_mailer\net\mail\transport\adapter\Mailgun::parameters()
  * @see li3_mailer\net\mail\transport\adapter\Mailgun::deliver()
  * @see li3_mailer\net\mail\Delivery
  * @author Mitch Pirtle (https://github.com/spacemonkey)
@@ -32,7 +32,7 @@ class Mailgun extends \li3_mailer\net\mail\transport\adapter\Simple {
 	 * Extra parameters supported by the Mailgun API.
 	 *
 	 * @see http://documentation.mailgun.net/api-sending.html
-	 * @see li3_mailer\net\mail\transport\adapter\Mailgun::_parameters()
+	 * @see li3_mailer\net\mail\transport\adapter\Mailgun::parameters()
 	 * @see li3_mailer\net\mail\Message
 	 * @var array
 	 */
@@ -55,17 +55,17 @@ class Mailgun extends \li3_mailer\net\mail\transport\adapter\Simple {
 	 * `messages` API endpoint (because a, if embedded attachments
 	 * were used Mailgun would alter the `Content-ID` for them, and
 	 * b, cURL needs to have a local file to send as file, but
-	 * not all attachments have a path), see `_parameters()`._
+	 * not all attachments have a path), see `parameters()`._
 	 *
-	 * @see li3_mailer\net\mail\transport\adapter\Mailgun::_parameters()
+	 * @see li3_mailer\net\mail\transport\adapter\Mailgun::parameters()
 	 * @see http://documentation.mailgun.net/api-sending.html
 	 * @see http://php.net/curl
 	 * @param object $message The message to deliver.
-	 * @param array $options Options (see `_parameters()`).
+	 * @param array $options Options (see `parameters()`).
 	 * @return mixed The return value of the `curl_exec` function.
 	 */
 	public function deliver($message, array $options = array()) {
-		list($url, $key, $parameters) = $this->_parameters($message, $options);
+		list($url, $key, $parameters) = $this->parameters($message, $options);
 
 		$curl = new $this->_classes['curl']();
 		$curl->open();
@@ -107,7 +107,7 @@ class Mailgun extends \li3_mailer\net\mail\transport\adapter\Simple {
 	 * @param array $options Given options.
 	 * @return array An array including the API URL, secret key and parameters.
 	 */
-	protected function _parameters($message, array $options = array()) {
+	public function parameters($message, array $options = array()) {
 		$defaults = array('api' => 'https://api.mailgun.net/v2');
 		$config = $this->_config + $options + $defaults;
 
@@ -135,7 +135,7 @@ class Mailgun extends \li3_mailer\net\mail\transport\adapter\Simple {
 			$url = join($url, "/");
 		}
 
-		$parameters = array('to' => $this->_address($message->to));
+		$parameters = array('to' => $this->address($message->to));
 		list($headers, $body) = $this->_generate($message);
 		$parameters['message'] = $headers . "\r\n" . $body;
 		foreach ($this->_extraParameters as $name => $type) {

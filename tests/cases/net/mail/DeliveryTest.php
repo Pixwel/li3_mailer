@@ -8,10 +8,7 @@ use li3_mailer\net\mail\Transport;
 class DeliveryTest extends \lithium\test\Unit {
 
 	public function testUsesGoodAdapters() {
-		$params = array(
-			array('adapter' => 'Simple'), DeliveryWithPath::adaptersPath()
-		);
-		$class = DeliveryWithPath::invokeMethod('_class', $params);
+		$class = DeliveryWithPath::__class(array('adapter' => 'Simple'), DeliveryWithPath::adaptersPath());
 		$adapter = new $class();
 		$this->assertTrue($adapter instanceof Transport);
 	}

@@ -74,7 +74,7 @@ class DebugTest extends \lithium\test\Unit {
 		$options = array('to' => 'foo@bar', 'subject' => 'test subject');
 		$message = new Message($options);
 		$debug = new Debug();
-		$result = $debug->invokeMethod('_format', array($message, 'short'));
+		$result = $debug->format($message, 'short');
 		$expected = 'Sent to foo@bar with subject `test subject`.';
 		$this->assertEqual($expected, $result);
 	}
@@ -88,7 +88,7 @@ class DebugTest extends \lithium\test\Unit {
 		));
 		$message->body('text', 'text body');
 		$debug = new Debug();
-		$result = $debug->invokeMethod('_format', array($message, 'normal'));
+		$result = $debug->format($message, 'normal');
 		$expected = "Mail sent to to from from " .
 			"(sender: sender, cc: cc, bcc: bcc)\n" .
 			"with date {$date} and subject `subject` in formats html, " .
@@ -107,7 +107,7 @@ class DebugTest extends \lithium\test\Unit {
 		$message->body('text', 'text body');
 		$message->body('html', 'html body');
 		$debug = new Debug();
-		$result = $debug->invokeMethod('_format', array($message, 'full'));
+		$result = $debug->format($message, 'full');
 		$expected = "Mail sent to to from from " .
 			"(sender: sender, cc: cc, bcc: bcc)\n" .
 			"with date {$date} and subject `subject` in formats html, " .
@@ -119,7 +119,7 @@ class DebugTest extends \lithium\test\Unit {
 	public function testFormatVerbose() {
 		$message = new Message();
 		$debug = new Debug();
-		$result = $debug->invokeMethod('_format', array($message, 'verbose'));
+		$result = $debug->format($message, 'verbose');
 		//need to scope $message to hide protected vars
 		$formatter = function ($message) {
 			$properties = var_export(get_object_vars($message), true);
@@ -132,7 +132,7 @@ class DebugTest extends \lithium\test\Unit {
 	public function testFormatNoData() {
 		$message = new Message();
 		$debug = new Debug();
-		$result = $debug->invokeMethod('_format', array($message, 'short'));
+		$result = $debug->format($message, 'short');
 		$this->assertEqual('Sent to  with subject ``.', $result);
 	}
 
@@ -140,7 +140,7 @@ class DebugTest extends \lithium\test\Unit {
 		$message = new Message();
 		$foo = function($message) { return 'foo'; };
 		$debug = new Debug(array('formats' => compact('foo')));
-		$result = $debug->invokeMethod('_format', array($message, 'foo'));
+		$result = $debug->format($message, 'foo');
 		$this->assertEqual('foo', $result);
 	}
 
@@ -148,7 +148,7 @@ class DebugTest extends \lithium\test\Unit {
 		$this->assertException('Formatter for format `foo` is neither string nor closure.', function () {
 			$message = new Message();
 			$debug = new Debug();
-			$debug->invokeMethod('_format', array($message, 'foo'));
+			$debug->format($message, 'foo');
 		});
 	}
 }

@@ -30,7 +30,7 @@ class Debug extends \li3_mailer\net\mail\Transport {
 	/**
 	 * Log a message.
 	 *
-	 * @see li3_mailer\net\mail\transport\adapter\Debug::_format()
+	 * @see li3_mailer\net\mail\transport\adapter\Debug::format()
 	 * @param object $message The message to log.
 	 * @param array $options Options supported:
 	 *        - `'log'` _string_ or _resource_: Path to the log file or
@@ -41,7 +41,7 @@ class Debug extends \li3_mailer\net\mail\Transport {
 	 *          Alternatively it may be a resource. Defaults to
 	 *          `'/tmp/logs/mail.log'` relative to application's resources.
 	 *        - `'format'` _string_: formatter name, defaults to `'normal'`,
-	 *          see `_format()`.
+	 *          see `format()`.
 	 * @return boolean Returns `true` if the message was successfully logged,
 	 *         `false` otherwise.
 	 */
@@ -50,7 +50,7 @@ class Debug extends \li3_mailer\net\mail\Transport {
 			'log' => Libraries::get(true, 'resources') . '/tmp/logs/mail.log',
 			'format' => 'normal'
 		);
-		$entry = $this->_format($message, $options['format']);
+		$entry = $this->format($message, $options['format']);
 		$entry = '[' . date('c') . '] ' . $entry . PHP_EOL;
 		$log = $options['log'];
 		if (!is_resource($log)) {
@@ -74,7 +74,7 @@ class Debug extends \li3_mailer\net\mail\Transport {
 	 * @param string $format Formatter name to use.
 	 * @return string Formatted log entry.
 	 */
-	protected function _format($message, $format) {
+	public function format($message, $format) {
 		$formatters = $this->_formatters();
 		$formatter = isset($formatters[$format]) ? $formatters[$format] : null;
 		switch (true) {
@@ -140,7 +140,7 @@ class Debug extends \li3_mailer\net\mail\Transport {
 	 *   return an array which will be merged into the data array.
 	 *
 	 * @see li3_mailer\net\mail\transport\adapter\Debug::_formatters()
-	 * @see li3_mailer\net\mail\transport\adapter\Debug::_format()
+	 * @see li3_mailer\net\mail\transport\adapter\Debug::format()
 	 * @see li3_mailer\net\mail\Message
 	 * @param object $message Message.
 	 * @return array Message data.
@@ -183,7 +183,7 @@ class Debug extends \li3_mailer\net\mail\Transport {
 			if ($config instanceof Closure) {
 				$value = $config($value);
 			} else if ($config === 'address') {
-				$value = $this->_address($value);
+				$value = $this->address($value);
 			}
 			$data[$prop] = $value;
 		}

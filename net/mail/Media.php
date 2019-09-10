@@ -12,7 +12,7 @@ use lithium\core\Libraries;
  * configuring how the framework handles output in different formats for
  * rendering emails.
  */
-class Media extends \lithium\core\StaticObject {
+class Media extends \lithium\core\StaticObjectDeprecated {
 	/**
 	 * Maps file extensions to content-types.  Used to render content into
 	 * message. Can be modified with `Media::type()`.
@@ -80,7 +80,7 @@ class Media extends \lithium\core\StaticObject {
 			unset(static::$_types[$type], static::$_handlers[$type]);
 		}
 		if (!$content && !$options) {
-			return static::_types($type);
+			return static::types($type);
 		}
 		if ($content) {
 			static::$_types[$type] = $content;
@@ -104,7 +104,7 @@ class Media extends \lithium\core\StaticObject {
 	 */
 	public static function render(&$message, $data = null, array $options = array()) {
 		$params = array('message' => &$message) + compact('data', 'options');
-		$handlers = static::_handlers();
+		$handlers = static::handlers();
 		$filter = function($params) use ($handlers) {
 			$defaults = array(
 				'template' => null, 'layout' => 'default', 'view' => null
@@ -122,7 +122,7 @@ class Media extends \lithium\core\StaticObject {
 				$filter = function($v) { return $v !== null; };
 				$handler = array_filter($handler, $filter);
 				$handler += $handlers['default'] + $defaults;
-				$handler['paths'] = static::_finalizePaths($handler['paths'], $options);
+				$handler['paths'] = static::finalizePaths($handler['paths'], $options);
 				$message->body($type, static::_handle($handler, $data, $message));
 			}
 			$message->ensureStandardCompliance();
@@ -195,13 +195,13 @@ class Media extends \lithium\core\StaticObject {
 			$message =& $params['message'];
 
 			if (!is_array($handler)) {
-				$handler = static::_handlers($handler);
+				$handler = static::handlers($handler);
 			}
 			$class = $handler['view'];
 			unset($handler['view']);
 
 			$config = $handler + array('message' => &$message);
-			return static::_instance($class, $config);
+			return Libraries::instance(null, $class, $config, static::$_classes);
 		});
 	}
 
@@ -259,7 +259,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @param string $type Type to return.
 	 * @return mixed Array of types, or single type requested.
 	 */
-	protected static function _types($type = null) {
+	public static function types($type = null) {
 		$types = static::$_types + array(
 			'html'         => 'text/html',
 			'text'         => 'text/plain'
@@ -277,7 +277,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @param string $type The type of handler to return.
 	 * @return mixed Array of all handlers, or the handler for a specific type.
 	 */
-	protected static function _handlers($type = null) {
+	public static function handlers($type = null) {
 		$template = array(
 			'{:library}/mails/{:mailer}/{:template}.{:type}.php' => 'mailer',
 			'{:library}/mails/{:template}.{:type}.php'
@@ -310,13 +310,13 @@ class Media extends \lithium\core\StaticObject {
 	 * and is used by the `'default'` handler to enable/disable `'template'`
 	 * paths based on whether the `'mailer'` is available.
 	 *
-	 * @see li3_mailer\net\mail\Media::_handlers()
+	 * @see li3_mailer\net\mail\Media::handlers()
 	 * @see li3_mailer\net\mail\Media::render()
 	 * @param array $paths The paths configuration that should be finalized.
 	 * @param array $data The data.
 	 * @return array Finalized paths.
 	 */
-	protected static function _finalizePaths($paths, array $data) {
+	public static function finalizePaths($paths, array $data) {
 		$finalized = array();
 		foreach ($paths as $type => $path) {
 			if (!is_array($path)) {
@@ -353,7 +353,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @return object Request.
 	 * @filter
 	 */
-	protected static function _request($message) {
+	public static function request($message) {
 		$params = compact('message');
 		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			extract($params);
@@ -370,7 +370,7 @@ class Media extends \lithium\core\StaticObject {
 				}
 				$config += compact('env', 'base');
 			}
-			return static::_instance('request', $config);
+			return Libraries::instance(null, 'request', $config, static::$_classes);
 		});
 	}
 }

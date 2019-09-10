@@ -2,9 +2,10 @@
 
 namespace li3_mailer\action;
 
+use BadMethodCallException;
+use lithium\core\Libraries;
 use lithium\aop\Filters;
 use lithium\util\Inflector;
-use BadMethodCallException;
 
 /**
  * The `Mailer` class is the fundamental building block for sending mails
@@ -16,7 +17,7 @@ use BadMethodCallException;
  * @see li3_mailer\net\mail\Delivery
  * @see li3_mailer\action\Mailer::deliver()
  */
-class Mailer extends \lithium\core\StaticObject {
+class Mailer extends \lithium\core\StaticObjectDeprecated {
 
 	/**
 	 * Holds extra configurations per message (and a default
@@ -64,7 +65,7 @@ class Mailer extends \lithium\core\StaticObject {
 			$options = $params['options'];
 			$class = isset($options['class']) ? $options['class'] : 'message';
 			unset($options['class']);
-			return static::_instance($class, $options);
+			return Libraries::instance(null, $class, $options, static::$_classes);
 		};
 		return Filters::run(get_called_class(), __FUNCTION__, compact('options'), $filter);
 	}

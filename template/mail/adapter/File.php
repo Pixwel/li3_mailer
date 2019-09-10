@@ -2,7 +2,7 @@
 
 namespace li3_mailer\template\mail\adapter;
 
-use lithium\core\Object;
+use lithium\core\ObjectDeprecated;
 use RuntimeException;
 use lithium\core\Libraries;
 use lithium\core\ClassNotFoundException;
@@ -92,13 +92,13 @@ class File extends \lithium\template\view\adapter\File {
 	 * @return void
 	 */
 	protected function _init() {
-		Object::_init();
+		ObjectDeprecated::_init();
 
 		$classes =& $this->_classes;
 		$message =& $this->_message;
 		if (!$this->_request && $message) {
 			$media = $classes['media'];
-			$this->_request = $media::invokeMethod('_request', array($message));
+			$this->_request = $media::request($message);
 		}
 		$request =& $this->_request;
 		$context =& $this->_context;
@@ -142,7 +142,7 @@ class File extends \lithium\template\view\adapter\File {
 					return $path;
 				}
 			},
-			'options' => '_attributes',
+			'options' => 'attributes',
 			'title'   => 'escape',
 			'scripts' => function($scripts) use (&$context) {
 				return "\n\t" . join("\n\t", $context['scripts']) . "\n";

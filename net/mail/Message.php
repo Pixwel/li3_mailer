@@ -3,6 +3,7 @@
 namespace li3_mailer\net\mail;
 
 use RuntimeException;
+use lithium\core\Libraries;
 use lithium\action\Request;
 
 /**
@@ -10,7 +11,7 @@ use lithium\action\Request;
  *
  * @see http://tools.ietf.org/html/rfc2822
  */
-class Message extends \lithium\core\Object {
+class Message extends \lithium\core\ObjectDeprecated {
 	/**
 	 * Subject.
 	 *
@@ -111,7 +112,7 @@ class Message extends \lithium\core\Object {
 	 * @see li3_mailer\net\mail\Message::_init()
 	 * @see li3_mailer\net\mail\Message::_discoverURL()
 	 * @see li3_mailer\net\mail\Media::_request()
-	 * @see li3_mailer\net\mail\Message::_randomId()
+	 * @see li3_mailer\net\mail\Message::randomId()
 	 * @var string
 	 */
 	public $baseURL = null;
@@ -267,12 +268,12 @@ class Message extends \lithium\core\Object {
 	 * For available configuration options see `attach()`.
 	 *
 	 * Furthermore it initializes the grammar (used to validate generated
-	 * Content-IDs, see `_randomId()`) and the `$baseURL`
+	 * Content-IDs, see `randomId()`) and the `$baseURL`
 	 * (see `_discoverURL()`).
 	 *
 	 * @see li3_mailer\net\mail\Message::__construct()
 	 * @see li3_mailer\net\mail\Message::attach()
-	 * @see li3_mailer\net\mail\Message::_randomId()
+	 * @see li3_mailer\net\mail\Message::randomId()
 	 * @see li3_mailer\net\mail\Message::_discoverURL()
 	 * @return void
 	 */
@@ -294,7 +295,7 @@ class Message extends \lithium\core\Object {
 		} else {
 			$grammar = array();
 		}
-		$this->_grammar = $this->_instance('grammar', compact('grammar'));
+		$this->_grammar = Libraries::instance(null, 'grammar', compact('grammar'), $this->_classes);
 		$this->baseURL = $this->baseURL ?: $this->_discoverURL();
 		if ($this->baseURL && strpos($this->baseURL, '://') === false) {
 			$this->baseURL = 'http://' . $this->baseURL;
@@ -605,10 +606,10 @@ class Message extends \lithium\core\Object {
 	 *
 	 * The default options set by this method are:
 	 *
-	 * - `'id'`: generates a random id with `_randomId()`,
+	 * - `'id'`: generates a random id with `randomId()`,
 	 * - `'disposition'`: defaults to `'inline'`.
 	 *
-	 * @see li3_mailer\net\mail\Message::_randomId()
+	 * @see li3_mailer\net\mail\Message::randomId()
 	 * @see li3_mailer\net\mail\Message::attach()
 	 * @param string $path See `attach()`.
 	 * @param array $options See `attach()`.
@@ -616,7 +617,7 @@ class Message extends \lithium\core\Object {
 	 */
 	public function embed($path, array $options = array()) {
 		$options += array(
-			'id' => $this->_randomId(), 'disposition' => 'inline'
+			'id' => $this->randomId(), 'disposition' => 'inline'
 		);
 		$this->attach($path, $options);
 		return $options['id'];
@@ -632,7 +633,7 @@ class Message extends \lithium\core\Object {
 	 * @see li3_mailer\net\mail\Grammar::isValidId()
 	 * @return string Content-ID.
 	 */
-	protected function _randomId() {
+	public function randomId() {
 		$left = time() . '.' . uniqid();
 		if (!empty($this->baseURL)) {
 			list($scheme, $url) = explode('://', $this->baseURL);
