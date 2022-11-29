@@ -2,6 +2,8 @@
 
 namespace li3_mailer\net\mail;
 
+use lithium\core\AutoConfigurable;
+
 /**
  * Grammar rules for checking Message validity (particularly Content ID syntax),
  * implements the RFC 2822 (and friends) ABNF grammar definitions.
@@ -9,14 +11,17 @@ namespace li3_mailer\net\mail;
  * @see http://tools.ietf.org/html/rfc2822
  * @see li3_mailer\net\mail\Message
  */
-class Grammar extends \lithium\core\ObjectDeprecated {
+class Grammar 
+{
+	use AutoConfigurable;
+
 	/**
 	 * Tokens and matching regular expression( part)s as key value pairs,
 	 * defined in RFC 2822 (and some related RFCs).
 	 *
 	 * @var array
 	 */
-	protected $_grammar = array();
+	protected $_grammar = [];
 
 	/**
 	 * Auto configuration properties.
@@ -30,8 +35,8 @@ class Grammar extends \lithium\core\ObjectDeprecated {
 	 *
 	 * @param array $config Options.
 	 */
-	public function __construct(array $config = array()) {
-		$grammar = array();
+	public function __construct(array $config = []) {
+		$grammar = [];
 		$grammar['NO-WS-CTL'] = '[\x01-\x08\x0B\x0C\x0E-\x19\x7F]';
 		$grammar['text'] = '[\x00-\x08\x0B\x0C\x0E-\x7F]';
 		$grammar['quoted-pair'] = "(?:\\\\{$grammar['text']})";
@@ -52,7 +57,9 @@ class Grammar extends \lithium\core\ObjectDeprecated {
 			"{$grammar['no-fold-literal']})";
 		$provided = isset($config['grammar']) ? $config['grammar'] : null;
 		$grammar = array_merge_recursive($grammar, (array) $provided);
-		parent::__construct(compact('grammar') + $config);
+		
+		$this->_autoConfig(compact('grammar') + $config, ['grammar']);
+        $this->_autoInit($config);
 	}
 
 	/**

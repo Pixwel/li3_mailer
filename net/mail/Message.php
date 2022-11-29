@@ -5,13 +5,16 @@ namespace li3_mailer\net\mail;
 use RuntimeException;
 use lithium\core\Libraries;
 use lithium\action\Request;
+use lithium\core\AutoConfigurable;
 
 /**
  * A mail message object (RFC 2822).
  *
  * @see http://tools.ietf.org/html/rfc2822
  */
-class Message extends \lithium\core\ObjectDeprecated {
+class Message
+{
+	use AutoConfigurable;
 	/**
 	 * Subject.
 	 *
@@ -244,7 +247,8 @@ class Message extends \lithium\core\ObjectDeprecated {
 			$this->{$key} = $value;
 		}
 		$defaults = array('mimeTypes' => array());
-		parent::__construct($config + $defaults);
+		$this->_autoConfig($config + $defaults, ['mimeTypes' => 'merge']);
+        $this->_autoInit($config);
 
 		$type = 'application/vnd.openxmlformats-officedocument';
 		$this->_mimeTypes += array(
