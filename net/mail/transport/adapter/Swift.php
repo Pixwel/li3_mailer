@@ -10,6 +10,8 @@ use RuntimeException;
 use Swift_Mailer;
 use Swift_Message;
 use Swift_Attachment;
+use DateTimeInterface;
+use DateTime;
 
 /**
  * The `Swift` adapter sends email messages with the SwiftMailer library.
@@ -166,6 +168,11 @@ class Swift extends \li3_mailer\net\mail\Transport {
 							}
 						}
 						$value = $newvalue;
+					}
+				}
+				if ($translated === 'date') {
+					if (!($value instanceof DateTimeInterface)) {
+						$value = new DateTime("@" . $value);
 					}
 				}
 				$method = "set" . Inflector::camelize($translated);
