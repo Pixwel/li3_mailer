@@ -3,6 +3,7 @@
 namespace li3_mailer\net\mail;
 
 use RuntimeException;
+use AllowDynamicProperties;
 use lithium\core\Libraries;
 use lithium\action\Request;
 use lithium\core\AutoConfigurable;
@@ -12,6 +13,7 @@ use lithium\core\AutoConfigurable;
  *
  * @see http://tools.ietf.org/html/rfc2822
  */
+#[AllowDynamicProperties]
 class Message
 {
 	use AutoConfigurable;
