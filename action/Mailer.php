@@ -17,8 +17,9 @@ use lithium\util\Inflector;
  * @see li3_mailer\net\mail\Delivery
  * @see li3_mailer\action\Mailer::deliver()
  */
-class Mailer extends \lithium\core\StaticObjectDeprecated {
-
+class Mailer
+{
+	use \lithium\core\AutoConfigurable;
 	/**
 	 * Holds extra configurations per message (and a default
 	 * for every message at key `0` if set). See `Mailer::_options()`.

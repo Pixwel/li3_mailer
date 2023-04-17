@@ -2,7 +2,6 @@
 
 namespace li3_mailer\template;
 
-use lithium\core\ObjectDeprecated;
 use lithium\core\Libraries;
 
 /**
@@ -38,7 +37,6 @@ class Mail extends \lithium\template\View {
 	 * @return void
 	 */
 	protected function _init() {
-		ObjectDeprecated::_init();
 
 		$type = isset($this->_config['type']) ? $this->_config['type'] : null;
 		if ($type === 'text') {
