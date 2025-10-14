@@ -2,6 +2,8 @@
 
 namespace li3_mailer\net\mail;
 
+use lithium\core\AutoConfigurable;
+
 /**
  * Base class for delivery (transport) adapters.
  *
@@ -11,7 +13,10 @@ namespace li3_mailer\net\mail;
  * @see li3_mailer\net\mail\transport\adapter\Swift
  * @see li3_mailer\net\mail\transport\adapter\Mailgun
  */
-abstract class Transport extends \lithium\core\ObjectDeprecated {
+abstract class Transport 
+{
+	use AutoConfigurable;
+	
 	/**
 	 * Deliver a message.
 	 *

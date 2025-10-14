@@ -2,7 +2,6 @@
 
 namespace li3_mailer\template\mail\adapter;
 
-use lithium\core\ObjectDeprecated;
 use RuntimeException;
 use lithium\core\Libraries;
 use lithium\core\ClassNotFoundException;
@@ -92,7 +91,6 @@ class File extends \lithium\template\view\adapter\File {
 	 * @return void
 	 */
 	protected function _init() {
-		ObjectDeprecated::_init();
 
 		$classes =& $this->_classes;
 		$message =& $this->_message;
@@ -213,6 +211,15 @@ class File extends \lithium\template\view\adapter\File {
 	 */
 	protected function _render($type, $template, array $data = array(), array $options = array()) {
 		$data += $this->_data;
+		
+		if (!isset($options['type'])) {
+			if (isset($this->_options['type'])) {
+				$options['type'] = $this->_options['type'];
+			} elseif (isset($this->_config['type'])) {
+				$options['type'] = $this->_config['type'];
+			}
+		}
+
 		$options = compact('template') + $options;
 		return $this->_view->render($type, $data, $options);
 	}
