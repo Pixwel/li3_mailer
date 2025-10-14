@@ -211,6 +211,15 @@ class File extends \lithium\template\view\adapter\File {
 	 */
 	protected function _render($type, $template, array $data = array(), array $options = array()) {
 		$data += $this->_data;
+		
+		if (!isset($options['type'])) {
+			if (isset($this->_options['type'])) {
+				$options['type'] = $this->_options['type'];
+			} elseif (isset($this->_config['type'])) {
+				$options['type'] = $this->_config['type'];
+			}
+		}
+
 		$options = compact('template') + $options;
 		return $this->_view->render($type, $data, $options);
 	}
