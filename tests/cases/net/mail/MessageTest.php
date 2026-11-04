@@ -81,7 +81,7 @@ class MessageTest extends \lithium\test\Unit {
 
 	public function testEnsureValidFromWithEmpty() {
 		foreach (array(null, false, 0) as $from) {
-			$this->assertException('`Message` should have at least one `$from` address.', function () {
+			$this->assertException('`Message` should have at least one `$from` address.', function () use ($from) {
 				$message = new Message(compact('from'));
 				$message->ensureValidFrom();
 			});

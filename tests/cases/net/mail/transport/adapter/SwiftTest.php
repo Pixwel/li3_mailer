@@ -6,7 +6,6 @@ use li3_mailer\net\mail\transport\adapter\Swift;
 use li3_mailer\tests\mocks\net\mail\transport\adapter\Swift as MockSwift;
 use li3_mailer\net\mail\Message;
 use Swift_Mailer;
-use Swift_MailTransport;
 use Swift_SendmailTransport;
 use Swift_SmtpTransport;
 
@@ -28,88 +27,77 @@ class SwiftTest extends \lithium\test\Unit {
 	public function testBadTransport() {
 		$this->assertException('Unknown transport type `` for `Swift` adapter.', function () {
 			$swift = new Swift();
-			$transport = $swift->invokeMethod('_transport');
+			$transport = (new \ReflectionMethod($swift, '_transport'))->invoke($swift);
 		});
 
 		$this->assertException('Unknown transport type `foo` for `Swift` adapter.', function () {
 			$swift = new Swift(array('transport' => 'foo'));
-			$transport = $swift->invokeMethod('_transport');
+			$transport = (new \ReflectionMethod($swift, '_transport'))->invoke($swift);
 		});
 	}
 
-	public function testMailTransport() {
-		$swift = new Swift(array('transport' => 'mail'));
-		$mailer = $swift->invokeMethod('_transport');
-		$this->assertTrue($mailer instanceof Swift_Mailer);
-		$transport = $mailer->getTransport();
-		$this->assertTrue($transport instanceof Swift_MailTransport);
-
-		$options = array('transport' => 'mail', 'extra_params' => 'foo');
-		$swift = new Swift($options);
-		$mailer = $swift->invokeMethod('_transport');
-		$this->assertEqual('foo', $mailer->getTransport()->getExtraParams());
-
-		$swift = new Swift(array('transport' => 'mail'));
-		$options = array('extra_params' => 'foo');
-		$mailer = $swift->invokeMethod('_transport', array($options));
-		$this->assertEqual('foo', $mailer->getTransport()->getExtraParams());
+	public function testUnsupportedMailTransport() {
+		$this->assertException('Unknown transport type `mail` for `Swift` adapter.', function () {
+			$swift = new Swift(array('transport' => 'mail'));
+			(new \ReflectionMethod($swift, '_transport'))->invoke($swift);
+		});
 	}
 
 	public function testSendmailTransport() {
 		$swift = new Swift(array('transport' => 'sendmail'));
-		$mailer = $swift->invokeMethod('_transport');
+		$mailer = (new \ReflectionMethod($swift, '_transport'))->invoke($swift);
 		$this->assertTrue($mailer instanceof Swift_Mailer);
 		$transport = $mailer->getTransport();
 		$this->assertTrue($transport instanceof Swift_SendmailTransport);
 
 		$options = array('transport' => 'sendmail', 'command' => 'foo');
 		$swift = new Swift($options);
-		$mailer = $swift->invokeMethod('_transport');
+		$mailer = (new \ReflectionMethod($swift, '_transport'))->invoke($swift);
 		$this->assertEqual('foo', $mailer->getTransport()->getCommand());
 
 		$swift = new Swift(array('transport' => 'sendmail'));
 		$command = 'foo';
-		$mailer = $swift->invokeMethod('_transport', array(compact('command')));
+		$mailer = (new \ReflectionMethod($swift, '_transport'))->invoke($swift, compact('command'));
 		$this->assertEqual('foo', $mailer->getTransport()->getCommand());
 	}
 
 	public function testSmtpTransport() {
 		$swift = new Swift(array('transport' => 'smtp'));
-		$mailer = $swift->invokeMethod('_transport');
+		$mailer = (new \ReflectionMethod($swift, '_transport'))->invoke($swift);
 		$this->assertTrue($mailer instanceof Swift_Mailer);
 		$transport = $mailer->getTransport();
 		$this->assertTrue($transport instanceof Swift_SmtpTransport);
 
 		$options = array(
-			'host' => 'test host', 'port' => 'test port',
-			'timeout' => 'test timeout', 'encryption' => 'test encryption',
-			'sourceip' => 'test sourceip', 'auth_mode' => 'test auth_mode',
+			'host' => 'test host', 'port' => 2525,
+			'timeout' => 10, 'encryption' => 'tls',
+			'sourceip' => '127.0.0.2', 'auth_mode' => 'login',
 			'local_domain' => 'test local_domain',
 			'username' => 'test username', 'password' => 'test password'
 		);
 		$swift = new Swift(array('transport' => 'smtp') + $options);
-		$mailer = $swift->invokeMethod('_transport');
+		$mailer = (new \ReflectionMethod($swift, '_transport'))->invoke($swift);
 		$transport = $mailer->getTransport();
 		$this->assertEqual('test host', $transport->getHost());
-		$this->assertEqual('test port', $transport->getPort());
-		$this->assertEqual('test timeout', $transport->getTimeout());
-		$this->assertEqual('test encryption', $transport->getEncryption());
-		$this->assertEqual('test sourceip', $transport->getSourceip());
+		$this->assertEqual(2525, $transport->getPort());
+		$this->assertEqual(10, $transport->getTimeout());
+		$this->assertEqual('tls', $transport->getEncryption());
+		$this->assertEqual('127.0.0.2', $transport->getSourceip());
 		$this->assertEqual('test local_domain', $transport->getLocalDomain());
-		$this->assertEqual('test auth_mode', $transport->getAuthMode());
+		$this->assertEqual('login', $transport->getAuthMode());
 		$this->assertEqual('test username', $transport->getUsername());
 		$this->assertEqual('test password', $transport->getPassword());
 
 		$swift = new Swift(array('transport' => 'smtp'));
-		$mailer = $swift->invokeMethod('_transport', array($options));
+		$mailer = (new \ReflectionMethod($swift, '_transport'))->invoke($swift, $options);
 		$transport = $mailer->getTransport();
 		$this->assertEqual('test host', $transport->getHost());
-		$this->assertEqual('test port', $transport->getPort());
-		$this->assertEqual('test timeout', $transport->getTimeout());
-		$this->assertEqual('test encryption', $transport->getEncryption());
-		$this->assertEqual('test sourceip', $transport->getSourceip());
+		$this->assertEqual(2525, $transport->getPort());
+		$this->assertEqual(10, $transport->getTimeout());
+		$this->assertEqual('tls', $transport->getEncryption());
+		$this->assertEqual('127.0.0.2', $transport->getSourceip());
 		$this->assertEqual('test local_domain', $transport->getLocalDomain());
-		$this->assertEqual('test auth_mode', $transport->getAuthMode());
+		$this->assertEqual('login', $transport->getAuthMode());
 		$this->assertEqual('test username', $transport->getUsername());
 		$this->assertEqual('test password', $transport->getPassword());
 	}
@@ -123,7 +111,7 @@ class SwiftTest extends \lithium\test\Unit {
 		));
 		$message->body('text', 'test body');
 		$swift = new Swift();
-		$swiftMessage = $swift->invokeMethod('_message', array($message));
+		$swiftMessage = (new \ReflectionMethod($swift, '_message'))->invoke($swift, $message);
 
 		$this->assertEqual(array('foo@bar' => 'Foo'), $swiftMessage->getTo());
 
@@ -148,7 +136,7 @@ class SwiftTest extends \lithium\test\Unit {
 		$message->body('text', 'test text body');
 		$message->body('html', '<b>test html body</b>');
 		$swift = new Swift();
-		$swiftMessage = $swift->invokeMethod('_message', array($message));
+		$swiftMessage = (new \ReflectionMethod($swift, '_message'))->invoke($swift, $message);
 		$this->assertEqual('<b>test html body</b>', $swiftMessage->getBody());
 		$children = $swiftMessage->getChildren();
 		$this->assertEqual(1, count($children));
@@ -168,7 +156,7 @@ class SwiftTest extends \lithium\test\Unit {
 		$message->body('text', 'text body');
 		$message->body('html', 'html body');
 		$swift = new Swift();
-		$swiftMessage = $swift->invokeMethod('_message', array($message));
+		$swiftMessage = (new \ReflectionMethod($swift, '_message'))->invoke($swift, $message);
 		$children = $swiftMessage->getChildren();
 		$attachments = array_filter($children, function($child) {
 			return in_array($child->getBody(), array('file data', 'my data'));

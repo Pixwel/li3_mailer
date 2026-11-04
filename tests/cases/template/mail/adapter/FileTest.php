@@ -10,6 +10,8 @@ use li3_mailer\tests\mocks\template\mail\adapter\File as FileMock;
 use lithium\net\http\Router;
 
 class FileTest extends \lithium\test\Unit {
+	protected $_routes = array();
+
 	public function setDefaultRoute() {
 		$this->_routes = Router::get();
 		Router::reset();

@@ -132,7 +132,7 @@ class Mailgun extends \li3_mailer\net\mail\transport\adapter\Simple {
 				throw new RuntimeException($error);
 			}
 			$url = array($config['api'], $config['domain'], 'messages.mime');
-			$url = join($url, "/");
+			$url = join("/", $url);
 		}
 
 		$parameters = array('to' => $this->address($message->to));
