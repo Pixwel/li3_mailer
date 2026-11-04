@@ -95,7 +95,7 @@ class Grammar
 	public function isValidId($id) {
 		$address = $this->token('id-left') . '@' . $this->token('id-right');
 		$pattern = '/^' . $address . '$/D';
-		return (boolean) preg_match($pattern, $id);
+		return (bool) preg_match($pattern, $id);
 	}
 }
 
